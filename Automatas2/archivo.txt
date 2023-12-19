@@ -1,0 +1,11 @@
+class h{
+void hola2 () 
+{int a grant 0;
+x grant a+a;
+bool a;
+if(a<b){
+cadena grant hola;
+}
+else{cadena grant adios;}
+}
+}

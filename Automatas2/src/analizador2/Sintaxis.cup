@@ -1,0 +1,155 @@
+package analizador2;
+
+import java_cup.runtime.Symbol;
+
+parser code
+{:
+    private Symbol s;
+    
+    public void syntax_error(Symbol s){
+        this.s = s;
+    }
+
+    public Symbol getS(){
+        return this.s;
+}
+:};
+
+terminal Int,Decimal,Import,Clase,Identificador,Coma,Comillas,Booleano,Cadena,
+ParentesisApertura,ParentesisCierre,LlaveApertura,LlaveCierre,Relacional,TrueFalse,
+Fin,If,Else,Numero,NumeroDecimal,Asigna,Texto,Arroba,Residuo,Multiplicacion,
+Caracter,NOT,Resta,Division,OR,AND,Suma,Punto,MetodoVacio,MetodoRetorno,Retorno,ERROR;
+
+non terminal INICIO,METODO, PARAM, METODO_PARAM, SENTENCIA, DECLARACION, IF, IF_ELSE, SENTENCIA_BOOLEANA,
+RETORNO, GRUPO_METODOS, OPERACIONES, OPERADOR, OPERANDO,SENTENCIAELSEIF;
+
+/* Precedencia */
+precedence nonassoc If;
+precedence nonassoc Else;
+precedence nonassoc LlaveCierre;
+
+start with INICIO;
+
+INICIO ::= 
+    Clase Identificador LlaveApertura GRUPO_METODOS LlaveCierre
+;
+
+METODO ::=
+    MetodoVacio Identificador ParentesisApertura ParentesisCierre LlaveApertura 
+    SENTENCIA LlaveCierre |
+    MetodoVacio Identificador ParentesisApertura METODO_PARAM ParentesisCierre LlaveApertura 
+    SENTENCIA LlaveCierre |
+
+
+    MetodoRetorno Int Identificador ParentesisApertura ParentesisCierre LlaveApertura
+    SENTENCIA RETORNO LlaveCierre |
+    MetodoRetorno Int Identificador ParentesisApertura METODO_PARAM ParentesisCierre LlaveApertura
+    SENTENCIA RETORNO LlaveCierre |
+    MetodoRetorno Cadena Identificador ParentesisApertura ParentesisCierre LlaveApertura
+    SENTENCIA RETORNO LlaveCierre |
+    MetodoRetorno Cadena Identificador ParentesisApertura METODO_PARAM ParentesisCierre LlaveApertura
+    SENTENCIA RETORNO LlaveCierre |
+    MetodoRetorno Decimal Identificador ParentesisApertura ParentesisCierre LlaveApertura
+    SENTENCIA RETORNO LlaveCierre |
+    MetodoRetorno Decimal Identificador ParentesisApertura METODO_PARAM ParentesisCierre LlaveApertura
+    SENTENCIA RETORNO LlaveCierre
+;
+
+GRUPO_METODOS ::=
+    METODO |
+    METODO GRUPO_METODOS
+;
+
+PARAM ::=
+    Int Identificador | 
+    Cadena Identificador |
+    Decimal Identificador |
+    Booleano Identificador
+ ;
+
+METODO_PARAM ::=
+    PARAM |
+    PARAM Coma METODO_PARAM
+;
+
+SENTENCIA ::= 
+    DECLARACION SENTENCIA |
+    DECLARACION |
+    IF |
+    SENTENCIAELSEIF |
+    IF_ELSE
+;
+
+
+DECLARACION ::= 
+    Int Identificador Fin | 
+    Int Identificador Asigna Numero Fin |
+    Int Identificador Asigna Identificador Fin |
+    Cadena Identificador Fin |
+    Cadena Identificador Asigna Texto Fin |
+    Decimal Identificador Fin |
+    Decimal Identificador Asigna NumeroDecimal Fin |
+    Decimal Identificador Asigna Numero Fin |
+    Decimal Identificador Asigna Identificador Fin |
+    Booleano Identificador Fin |
+    Booleano Identificador Asigna TrueFalse Fin |
+    Booleano Identificador Asigna Identificador Fin |
+    Identificador Asigna Identificador Fin |
+    Identificador Asigna Numero Fin |
+    Identificador Asigna NumeroDecimal Fin |
+    Identificador Asigna Texto Fin |
+    Identificador Asigna Comillas Comillas Fin |
+    OPERACIONES
+;
+
+
+SENTENCIA_BOOLEANA ::= 
+    TrueFalse | 
+    Identificador Relacional TrueFalse |
+    Identificador Relacional Numero |
+    Identificador Relacional NumeroDecimal |
+    Identificador Relacional Identificador |
+    Identificador Relacional Comillas Comillas |
+    Identificador Relacional Texto
+;
+
+IF ::= 
+    If ParentesisApertura SENTENCIA_BOOLEANA ParentesisCierre LlaveApertura SENTENCIA LlaveCierre |
+    If ParentesisApertura SENTENCIA ParentesisCierre LlaveApertura IF SENTENCIAELSEIF IF_ELSE LlaveCierre |
+    If ParentesisApertura SENTENCIA_BOOLEANA ParentesisCierre LlaveApertura IF IF_ELSE LlaveCierre |
+    If ParentesisApertura SENTENCIA_BOOLEANA ParentesisCierre LlaveApertura IF SENTENCIAELSEIF LlaveCierre |
+    If ParentesisApertura SENTENCIA_BOOLEANA ParentesisCierre LlaveApertura IF LlaveCierre |
+    If ParentesisApertura SENTENCIA_BOOLEANA ParentesisCierre LlaveApertura LlaveCierre |
+    If ParentesisApertura SENTENCIA_BOOLEANA ParentesisCierre LlaveApertura LlaveCierre IF
+;
+
+IF_ELSE ::= 
+    IF Else LlaveApertura SENTENCIA LlaveCierre
+;
+
+SENTENCIAELSEIF ::= 
+    SENTENCIAELSEIF Else IF |
+    Else IF
+;
+
+RETORNO ::=
+    Retorno Identificador Fin |
+    Retorno Numero Fin |
+    Retorno Texto Fin |
+    Retorno NumeroDecimal Fin 
+;
+
+OPERACIONES ::=
+    Identificador Asigna OPERANDO Fin
+;
+
+OPERADOR ::=
+    Suma Identificador |
+    Resta Identificador |
+    Multiplicacion Identificador 
+;
+
+OPERANDO ::=
+    Identificador OPERADOR |
+    OPERADOR OPERADOR
+;
